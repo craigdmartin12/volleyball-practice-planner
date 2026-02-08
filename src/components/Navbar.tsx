@@ -1,6 +1,7 @@
 import React from 'react';
-import { Volleyball, LogOut, User } from 'lucide-react';
+import { LogOut, User } from 'lucide-react';
 import { supabase } from '../services/supabase';
+import logo from '../assets/logo.svg';
 
 export const Navbar: React.FC = () => {
     const handleSignOut = () => supabase.auth.signOut();
@@ -9,10 +10,8 @@ export const Navbar: React.FC = () => {
         <nav className="bg-stonehill-purple text-white shadow-lg border-b border-white/10 sticky top-0 z-50">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="flex justify-between h-16 items-center">
-                    <div className="flex items-center gap-2">
-                        <div className="bg-stonehill-gold p-1.5 rounded-lg">
-                            <Volleyball className="w-6 h-6 text-stonehill-purple" />
-                        </div>
+                    <div className="flex items-center gap-3">
+                        <img src={logo} alt="Skyhawks Logo" className="w-8 h-8 drop-shadow-md" />
                         <span className="text-xl font-bold tracking-tight">Skyhawk Practice</span>
                     </div>
 
