@@ -81,12 +81,15 @@ export const Dashboard: React.FC = () => {
                 </div>
             ) : (
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                    {filteredDrills.map((drill) => (
-                        <DrillCard
-                            key={drill.id}
-                            drill={drill}
-                        />
-                    ))}
+                    {filteredDrills.map((drill) => {
+                        console.log('[Dashboard] Rendering drill card:', drill.id, drill.title);
+                        return (
+                            <DrillCard
+                                key={drill.id}
+                                drill={drill}
+                            />
+                        );
+                    })}
 
                     {filteredDrills.length === 0 && (
                         <div className="col-span-full py-20 text-center bg-gray-50 rounded-2xl border-2 border-dashed border-gray-200">

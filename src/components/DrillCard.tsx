@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { Clock, Tag, MoreVertical } from 'lucide-react';
 import type { Drill } from '../services/supabase';
 
@@ -9,6 +9,8 @@ interface DrillCardProps {
 }
 
 export const DrillCard: React.FC<DrillCardProps> = ({ drill }) => {
+    const navigate = useNavigate();
+
     const getDifficultyColor = (diff: string) => {
         switch (diff) {
             case 'Beginner': return 'bg-emerald-100 text-emerald-700 border-emerald-200';
@@ -18,9 +20,14 @@ export const DrillCard: React.FC<DrillCardProps> = ({ drill }) => {
         }
     };
 
+    const handleCardClick = () => {
+        console.log('Navigating to drill:', drill.id);
+        navigate(`/drill/${drill.id}`);
+    };
+
     return (
-        <Link
-            to={`/drill/${drill.id}`}
+        <div
+            onClick={handleCardClick}
             className="bg-white rounded-xl shadow-sm border border-gray-200 p-5 hover:shadow-md transition-all group relative cursor-pointer active:scale-[0.98] block"
         >
             <div className="flex justify-between items-start mb-3">
@@ -32,7 +39,6 @@ export const DrillCard: React.FC<DrillCardProps> = ({ drill }) => {
                     onClick={(e) => {
                         e.preventDefault();
                         e.stopPropagation();
-                        // Additional menu logic here if needed
                     }}
                 >
                     <MoreVertical className="w-4 h-4" />
@@ -61,6 +67,6 @@ export const DrillCard: React.FC<DrillCardProps> = ({ drill }) => {
                     </span>
                 ))}
             </div>
-        </Link>
+        </div>
     );
 };

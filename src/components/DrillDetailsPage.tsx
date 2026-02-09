@@ -9,17 +9,23 @@ export const DrillDetailsPage: React.FC = () => {
     const { drills, loading, fetchDrills } = useStore();
 
     useEffect(() => {
+        console.log('[DrillDetailsPage] Mounted. ID:', id, 'Drills count:', drills.length);
         if (drills.length === 0) {
+            console.log('[DrillDetailsPage] No drills in store, fetching...');
             fetchDrills();
         }
-    }, [drills.length, fetchDrills]);
+    }, [drills.length, fetchDrills, id]);
 
     const drill = drills.find(d => d.id === id);
 
     if (loading && drills.length === 0) {
+        console.log('[DrillDetailsPage] Currently loading...');
         return (
-            <div className="min-h-screen flex items-center justify-center">
-                <Loader2 className="w-12 h-12 animate-spin text-stonehill-purple" />
+            <div className="min-h-screen flex items-center justify-center bg-gray-50">
+                <div className="text-center">
+                    <Loader2 className="w-12 h-12 animate-spin text-stonehill-purple mx-auto mb-4" />
+                    <p className="text-gray-500 font-medium">Fetching drill details...</p>
+                </div>
             </div>
         );
     }

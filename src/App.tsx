@@ -28,6 +28,10 @@ function App() {
     return () => subscription.unsubscribe();
   }, []);
 
+  useEffect(() => {
+    console.log('[App] Current path:', location.pathname);
+  }, [location.pathname]);
+
   if (loading) {
     return (
       <div className="min-h-screen bg-stonehill-purple flex items-center justify-center">
@@ -83,7 +87,7 @@ function App() {
         </div>
       )}
 
-      <main className="animate-in fade-in slide-in-from-bottom-2 duration-500">
+      <main className="min-h-[50vh]">
         <Routes>
           <Route path="/" element={<Dashboard />} />
           <Route path="/builder" element={<PracticeBuilder />} />
