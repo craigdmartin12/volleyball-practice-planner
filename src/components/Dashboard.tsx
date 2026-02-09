@@ -45,7 +45,7 @@ export const Dashboard: React.FC = () => {
                     <h1 className="text-3xl font-extrabold text-gray-900 tracking-tight">Drill Library</h1>
                     <p className="text-gray-500 mt-1 flex items-center gap-2">
                         <BookOpen className="w-4 h-4 text-stonehill-purple" />
-                        Manage your volleyball drills and training sessions
+                        Manage volleyball drills and training sessions
                     </p>
                 </div>
                 <button
@@ -77,7 +77,7 @@ export const Dashboard: React.FC = () => {
             {loading && drills.length === 0 ? (
                 <div className="flex flex-col items-center justify-center py-24 text-gray-400">
                     <Loader2 className="w-12 h-12 animate-spin mb-4 text-stonehill-purple/30" />
-                    <p className="font-medium">Loading your drills...</p>
+                    <p className="font-medium">Loading drills...</p>
                 </div>
             ) : (
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">

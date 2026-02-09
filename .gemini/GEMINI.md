@@ -30,7 +30,7 @@
 
 ### 3. Database (`supabase_schema.sql`)
 - **Tables**: `drills`, `practices`, `practice_items` (join table for sorting).
-- **Security**: Row Level Security (RLS) is enabled on all tables. Users only see data where `user_id = auth.uid()`.
+- **Security**: Row Level Security (RLS) is enabled on all tables. All authenticated users can view all drills, but users only see their own `practices` data. Modifying drills is restricted to the creator.
 
 ---
 

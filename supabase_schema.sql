@@ -47,7 +47,14 @@ ALTER TABLE practice_items ENABLE ROW LEVEL SECURITY;
 
 -- RLS Policies
 DO $$ BEGIN
-    CREATE POLICY "Users can only access their own drills" ON drills
+    CREATE POLICY "Drills are viewable by all authenticated users" ON drills
+        FOR SELECT USING (auth.uid() IS NOT NULL);
+EXCEPTION
+    WHEN duplicate_object THEN null;
+END $$;
+
+DO $$ BEGIN
+    CREATE POLICY "Users can manage their own drills" ON drills
         FOR ALL USING (auth.uid() = user_id);
 EXCEPTION
     WHEN duplicate_object THEN null;
