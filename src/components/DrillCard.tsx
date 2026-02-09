@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom';
 import { Clock, Tag, MoreVertical } from 'lucide-react';
 import type { Drill } from '../services/supabase';
 
@@ -5,11 +6,9 @@ interface DrillCardProps {
     drill: Drill;
     onEdit?: (drill: Drill) => void;
     onDelete?: (id: string) => void;
-    onClick?: (drill: Drill) => void;
-    draggable?: boolean;
 }
 
-export const DrillCard: React.FC<DrillCardProps> = ({ drill, onClick }) => {
+export const DrillCard: React.FC<DrillCardProps> = ({ drill }) => {
     const getDifficultyColor = (diff: string) => {
         switch (diff) {
             case 'Beginner': return 'bg-emerald-100 text-emerald-700 border-emerald-200';
@@ -20,17 +19,18 @@ export const DrillCard: React.FC<DrillCardProps> = ({ drill, onClick }) => {
     };
 
     return (
-        <div
-            onClick={() => onClick?.(drill)}
-            className={`bg-white rounded-xl shadow-sm border border-gray-200 p-5 hover:shadow-md transition-shadow group relative ${onClick ? 'cursor-pointer active:scale-[0.98]' : ''}`}
+        <Link
+            to={`/drill/${drill.id}`}
+            className="bg-white rounded-xl shadow-sm border border-gray-200 p-5 hover:shadow-md transition-all group relative cursor-pointer active:scale-[0.98] block"
         >
             <div className="flex justify-between items-start mb-3">
                 <h3 className="font-bold text-gray-900 group-hover:text-stonehill-purple transition-colors line-clamp-1">
                     {drill.title}
                 </h3>
                 <button
-                    className="text-gray-400 hover:text-gray-600 p-1 rounded-md hover:bg-gray-50"
+                    className="text-gray-400 hover:text-gray-600 p-1 rounded-md hover:bg-gray-50 flex-shrink-0"
                     onClick={(e) => {
+                        e.preventDefault();
                         e.stopPropagation();
                         // Additional menu logic here if needed
                     }}
@@ -61,6 +61,6 @@ export const DrillCard: React.FC<DrillCardProps> = ({ drill, onClick }) => {
                     </span>
                 ))}
             </div>
-        </div>
+        </Link>
     );
 };

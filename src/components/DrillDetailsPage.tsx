@@ -1,22 +1,37 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Clock, Tag, BookOpen, Share2 } from 'lucide-react';
+import { ArrowLeft, Clock, Tag, BookOpen, Share2, Loader2 } from 'lucide-react';
 import { useStore } from '../store/useStore';
 
 export const DrillDetailsPage: React.FC = () => {
     const { id } = useParams<{ id: string }>();
     const navigate = useNavigate();
-    const { drills } = useStore();
+    const { drills, loading, fetchDrills } = useStore();
+
+    useEffect(() => {
+        if (drills.length === 0) {
+            fetchDrills();
+        }
+    }, [drills.length, fetchDrills]);
 
     const drill = drills.find(d => d.id === id);
+
+    if (loading && drills.length === 0) {
+        return (
+            <div className="min-h-screen flex items-center justify-center">
+                <Loader2 className="w-12 h-12 animate-spin text-stonehill-purple" />
+            </div>
+        );
+    }
 
     if (!drill) {
         return (
             <div className="max-w-7xl mx-auto px-4 py-20 text-center">
-                <h2 className="text-2xl font-bold text-gray-900 mb-4">Drill not found</h2>
+                <h2 className="text-2xl font-bold text-gray-900 mb-4 font-mono">DRILL NOT FOUND</h2>
+                <p className="text-gray-500 mb-8">We couldn't find the drill you're looking for. It may have been deleted.</p>
                 <button
                     onClick={() => navigate('/')}
-                    className="text-stonehill-purple font-bold flex items-center gap-2 mx-auto hover:underline"
+                    className="bg-stonehill-purple text-white px-6 py-3 rounded-xl font-bold flex items-center gap-2 mx-auto hover:bg-stonehill-purple/90 transition-all shadow-lg shadow-stonehill-purple/20"
                 >
                     <ArrowLeft className="w-4 h-4" /> Back to Library
                 </button>

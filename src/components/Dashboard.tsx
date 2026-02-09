@@ -1,13 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { Plus, Search, Filter, Loader2, BookOpen } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
 import { useStore } from '../store/useStore';
 import { DrillCard } from './DrillCard';
 import type { Drill } from '../services/supabase';
 
 export const Dashboard: React.FC = () => {
     const { drills, loading, fetchDrills, addDrill } = useStore();
-    const navigate = useNavigate();
     const [searchTerm, setSearchTerm] = useState('');
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
     const [newDrill, setNewDrill] = useState<Partial<Drill>>({
@@ -87,7 +85,6 @@ export const Dashboard: React.FC = () => {
                         <DrillCard
                             key={drill.id}
                             drill={drill}
-                            onClick={(d) => navigate(`/drill/${d.id}`)}
                         />
                     ))}
 
