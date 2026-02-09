@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
     DndContext,
     closestCenter,
@@ -28,7 +29,6 @@ import {
     Info
 } from 'lucide-react';
 import { useStore } from '../store/useStore';
-import { DrillDetailsModal } from './DrillDetailsModal';
 import type { Drill } from '../services/supabase';
 import { api } from '../services/supabase';
 
@@ -104,10 +104,10 @@ const SortablePracticeDrill: React.FC<SortableItemProps> = ({ id, drill, onRemov
 
 export const PracticeBuilder: React.FC = () => {
     const { drills, fetchDrills } = useStore();
+    const navigate = useNavigate();
     const [practiceDrills, setPracticeDrills] = useState<(Drill & { instanceId: string })[]>([]);
     const [title, setTitle] = useState('New Practice Plan');
     const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
-    const [selectedDrill, setSelectedDrill] = useState<Drill | null>(null);
 
     useEffect(() => {
         fetchDrills();
@@ -215,7 +215,7 @@ export const PracticeBuilder: React.FC = () => {
                                     <button
                                         onClick={(e) => {
                                             e.stopPropagation();
-                                            setSelectedDrill(drill);
+                                            navigate(`/drill/${drill.id}`);
                                         }}
                                         className="absolute right-3 top-1/2 -translate-y-1/2 p-2 text-gray-300 hover:text-stonehill-purple hover:bg-stonehill-purple/5 rounded-lg transition-all opacity-0 group-hover:opacity-100"
                                         title="View Details"
@@ -231,7 +231,6 @@ export const PracticeBuilder: React.FC = () => {
                 {/* Right: Practice Canvas */}
                 <div className="lg:col-span-8 flex flex-col gap-6">
                     <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-200">
-                        {/* ... Existing Canvas Content ... */}
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
                             <div>
                                 <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Practice Title</label>
@@ -299,7 +298,7 @@ export const PracticeBuilder: React.FC = () => {
                                                 id={drill.instanceId}
                                                 drill={drill}
                                                 onRemove={removeDrillFromPractice}
-                                                onView={setSelectedDrill}
+                                                onView={(d) => navigate(`/drill/${d.id}`)}
                                             />
                                         ))}
                                     </SortableContext>
@@ -309,12 +308,6 @@ export const PracticeBuilder: React.FC = () => {
                     </div>
                 </div>
             </div>
-
-            {/* Drill Details Modal */}
-            <DrillDetailsModal
-                drill={selectedDrill}
-                onClose={() => setSelectedDrill(null)}
-            />
         </div>
     );
 };
