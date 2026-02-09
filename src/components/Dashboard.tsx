@@ -2,12 +2,14 @@ import React, { useEffect, useState } from 'react';
 import { Plus, Search, Filter, Loader2, BookOpen } from 'lucide-react';
 import { useStore } from '../store/useStore';
 import { DrillCard } from './DrillCard';
+import { DrillDetailsModal } from './DrillDetailsModal';
 import type { Drill } from '../services/supabase';
 
 export const Dashboard: React.FC = () => {
     const { drills, loading, fetchDrills, addDrill } = useStore();
     const [searchTerm, setSearchTerm] = useState('');
-    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+    const [selectedDrill, setSelectedDrill] = useState<Drill | null>(null);
     const [newDrill, setNewDrill] = useState<Partial<Drill>>({
         title: '',
         description: '',
@@ -28,7 +30,7 @@ export const Dashboard: React.FC = () => {
     const handleCreateDrill = async (e: React.FormEvent) => {
         e.preventDefault();
         await addDrill(newDrill as any);
-        setIsModalOpen(false);
+        setIsCreateModalOpen(false);
         setNewDrill({
             title: '',
             description: '',
@@ -49,7 +51,7 @@ export const Dashboard: React.FC = () => {
                     </p>
                 </div>
                 <button
-                    onClick={() => setIsModalOpen(true)}
+                    onClick={() => setIsCreateModalOpen(true)}
                     className="bg-stonehill-purple hover:bg-stonehill-purple/90 text-white px-5 py-2.5 rounded-xl font-bold flex items-center gap-2 shadow-lg shadow-stonehill-purple/20 transition-all hover:translate-y-[-2px] active:translate-y-0"
                 >
                     <Plus className="w-5 h-5" />
@@ -82,7 +84,11 @@ export const Dashboard: React.FC = () => {
             ) : (
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                     {filteredDrills.map((drill) => (
-                        <DrillCard key={drill.id} drill={drill} />
+                        <DrillCard
+                            key={drill.id}
+                            drill={drill}
+                            onClick={setSelectedDrill}
+                        />
                     ))}
 
                     {filteredDrills.length === 0 && (
@@ -95,11 +101,17 @@ export const Dashboard: React.FC = () => {
                 </div>
             )}
 
-            {/* Basic Create Modal (Slide-over would be nicer, but keeping it simple as requested) */}
-            {isModalOpen && (
+            {/* View Details Modal */}
+            <DrillDetailsModal
+                drill={selectedDrill}
+                onClose={() => setSelectedDrill(null)}
+            />
+
+            {/* Basic Create Modal */}
+            {isCreateModalOpen && (
                 <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
-                    <div className="absolute inset-0 bg-stonehill-purple/40 backdrop-blur-sm" onClick={() => setIsModalOpen(false)}></div>
-                    <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg relative z-10 overflow-hidden border border-white/20">
+                    <div className="absolute inset-0 bg-stonehill-purple/40 backdrop-blur-sm" onClick={() => setIsCreateModalOpen(false)}></div>
+                    <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg relative z-10 overflow-hidden border border-white/20 animate-in fade-in zoom-in duration-200">
                         <div className="bg-stonehill-purple p-6 text-white">
                             <h3 className="text-xl font-bold">New Drill Details</h3>
                             <p className="text-blue-200 text-sm mt-1">Add a new drill to your professional library</p>
@@ -157,7 +169,7 @@ export const Dashboard: React.FC = () => {
                             <div className="flex gap-3 mt-8">
                                 <button
                                     type="button"
-                                    onClick={() => setIsModalOpen(false)}
+                                    onClick={() => setIsCreateModalOpen(false)}
                                     className="flex-1 border border-gray-200 hover:bg-gray-50 text-gray-700 font-bold py-3 rounded-xl transition-colors"
                                 >
                                     Cancel

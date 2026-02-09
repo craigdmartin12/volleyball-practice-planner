@@ -5,10 +5,11 @@ interface DrillCardProps {
     drill: Drill;
     onEdit?: (drill: Drill) => void;
     onDelete?: (id: string) => void;
+    onClick?: (drill: Drill) => void;
     draggable?: boolean;
 }
 
-export const DrillCard: React.FC<DrillCardProps> = ({ drill }) => {
+export const DrillCard: React.FC<DrillCardProps> = ({ drill, onClick }) => {
     const getDifficultyColor = (diff: string) => {
         switch (diff) {
             case 'Beginner': return 'bg-emerald-100 text-emerald-700 border-emerald-200';
@@ -19,12 +20,21 @@ export const DrillCard: React.FC<DrillCardProps> = ({ drill }) => {
     };
 
     return (
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-5 hover:shadow-md transition-shadow group relative">
+        <div
+            onClick={() => onClick?.(drill)}
+            className={`bg-white rounded-xl shadow-sm border border-gray-200 p-5 hover:shadow-md transition-shadow group relative ${onClick ? 'cursor-pointer active:scale-[0.98]' : ''}`}
+        >
             <div className="flex justify-between items-start mb-3">
                 <h3 className="font-bold text-gray-900 group-hover:text-stonehill-purple transition-colors line-clamp-1">
                     {drill.title}
                 </h3>
-                <button className="text-gray-400 hover:text-gray-600">
+                <button
+                    className="text-gray-400 hover:text-gray-600 p-1 rounded-md hover:bg-gray-50"
+                    onClick={(e) => {
+                        e.stopPropagation();
+                        // Additional menu logic here if needed
+                    }}
+                >
                     <MoreVertical className="w-4 h-4" />
                 </button>
             </div>
@@ -44,7 +54,7 @@ export const DrillCard: React.FC<DrillCardProps> = ({ drill }) => {
             </div>
 
             <div className="flex flex-wrap gap-1">
-                {drill.tags.map((tag) => (
+                {drill.tags?.map((tag) => (
                     <span key={tag} className="flex items-center gap-1 text-[10px] text-gray-400 italic">
                         <Tag className="w-2.5 h-2.5" />
                         {tag}

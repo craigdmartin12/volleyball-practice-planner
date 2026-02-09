@@ -24,9 +24,11 @@ import {
     Printer,
     Calendar,
     AlertCircle,
-    Plus
+    Plus,
+    Info
 } from 'lucide-react';
 import { useStore } from '../store/useStore';
+import { DrillDetailsModal } from './DrillDetailsModal';
 import type { Drill } from '../services/supabase';
 import { api } from '../services/supabase';
 
@@ -34,9 +36,10 @@ interface SortableItemProps {
     id: string;
     drill: Drill;
     onRemove: (id: string) => void;
+    onView: (drill: Drill) => void;
 }
 
-const SortablePracticeDrill: React.FC<SortableItemProps> = ({ id, drill, onRemove }) => {
+const SortablePracticeDrill: React.FC<SortableItemProps> = ({ id, drill, onRemove, onView }) => {
     const {
         attributes,
         listeners,
@@ -63,8 +66,11 @@ const SortablePracticeDrill: React.FC<SortableItemProps> = ({ id, drill, onRemov
                 <GripVertical className="w-5 h-5" />
             </div>
 
-            <div className="flex-1">
-                <h4 className="font-bold text-gray-900">{drill.title}</h4>
+            <div
+                className="flex-1 cursor-pointer"
+                onClick={() => onView(drill)}
+            >
+                <h4 className="font-bold text-gray-900 group-hover:text-stonehill-purple transition-colors">{drill.title}</h4>
                 <div className="flex items-center gap-3 mt-1">
                     <span className="text-[11px] font-bold text-stonehill-purple bg-stonehill-purple/5 px-2 py-0.5 rounded-full uppercase tracking-wider">
                         {drill.difficulty}
@@ -76,12 +82,22 @@ const SortablePracticeDrill: React.FC<SortableItemProps> = ({ id, drill, onRemov
                 </div>
             </div>
 
-            <button
-                onClick={() => onRemove(id)}
-                className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-all opacity-0 group-hover:opacity-100"
-            >
-                <Trash2 className="w-4 h-4" />
-            </button>
+            <div className="flex items-center gap-1">
+                <button
+                    onClick={() => onView(drill)}
+                    className="p-2 text-gray-400 hover:text-stonehill-purple hover:bg-stonehill-purple/5 rounded-lg transition-all opacity-0 group-hover:opacity-100"
+                    title="View details"
+                >
+                    <Info className="w-4 h-4" />
+                </button>
+                <button
+                    onClick={() => onRemove(id)}
+                    className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-all opacity-0 group-hover:opacity-100"
+                    title="Remove from practice"
+                >
+                    <Trash2 className="w-4 h-4" />
+                </button>
+            </div>
         </div>
     );
 };
@@ -91,6 +107,7 @@ export const PracticeBuilder: React.FC = () => {
     const [practiceDrills, setPracticeDrills] = useState<(Drill & { instanceId: string })[]>([]);
     const [title, setTitle] = useState('New Practice Plan');
     const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
+    const [selectedDrill, setSelectedDrill] = useState<Drill | null>(null);
 
     useEffect(() => {
         fetchDrills();
@@ -177,24 +194,35 @@ export const PracticeBuilder: React.FC = () => {
                         </h3>
                         <div className="space-y-3 h-[calc(100vh-320px)] overflow-y-auto pr-2 custom-scrollbar">
                             {drills.map((drill) => (
-                                <button
-                                    key={drill.id}
-                                    onClick={() => addDrillToPractice(drill)}
-                                    className="w-full text-left bg-white border border-gray-200 rounded-xl p-4 hover:border-stonehill-purple hover:shadow-md transition-all group flex items-start justify-between"
-                                >
-                                    <div className="flex-1">
-                                        <h4 className="font-bold text-gray-800 text-sm group-hover:text-stonehill-purple">{drill.title}</h4>
-                                        <div className="flex items-center gap-2 mt-1">
-                                            <span className="text-[10px] font-bold text-stonehill-purple border border-stonehill-purple/20 px-1.5 py-0.5 rounded uppercase">
-                                                {drill.difficulty[0]}
-                                            </span>
-                                            <span className="text-[10px] text-gray-500 flex items-center gap-1">
-                                                <Clock className="w-3 h-3" /> {drill.duration_minutes}m
-                                            </span>
+                                <div key={drill.id} className="relative group">
+                                    <button
+                                        onClick={() => addDrillToPractice(drill)}
+                                        className="w-full text-left bg-white border border-gray-200 rounded-xl p-4 hover:border-stonehill-purple hover:shadow-md transition-all group/card flex items-start justify-between pr-10"
+                                    >
+                                        <div className="flex-1">
+                                            <h4 className="font-bold text-gray-800 text-sm group-hover/card:text-stonehill-purple transition-colors">{drill.title}</h4>
+                                            <div className="flex items-center gap-2 mt-1">
+                                                <span className="text-[10px] font-bold text-stonehill-purple border border-stonehill-purple/20 px-1.5 py-0.5 rounded uppercase font-mono">
+                                                    {drill.difficulty[0]}
+                                                </span>
+                                                <span className="text-[10px] text-gray-500 flex items-center gap-1">
+                                                    <Clock className="w-3 h-3" /> {drill.duration_minutes}m
+                                                </span>
+                                            </div>
                                         </div>
-                                    </div>
-                                    <ChevronRight className="w-4 h-4 text-gray-300 group-hover:text-stonehill-purple group-hover:translate-x-1 transition-all" />
-                                </button>
+                                        <ChevronRight className="w-4 h-4 text-gray-300 group-hover/card:text-stonehill-purple group-hover/card:translate-x-1 transition-all" />
+                                    </button>
+                                    <button
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            setSelectedDrill(drill);
+                                        }}
+                                        className="absolute right-3 top-1/2 -translate-y-1/2 p-2 text-gray-300 hover:text-stonehill-purple hover:bg-stonehill-purple/5 rounded-lg transition-all opacity-0 group-hover:opacity-100"
+                                        title="View Details"
+                                    >
+                                        <Info className="w-4 h-4" />
+                                    </button>
+                                </div>
                             ))}
                         </div>
                     </div>
@@ -203,6 +231,7 @@ export const PracticeBuilder: React.FC = () => {
                 {/* Right: Practice Canvas */}
                 <div className="lg:col-span-8 flex flex-col gap-6">
                     <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-200">
+                        {/* ... Existing Canvas Content ... */}
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
                             <div>
                                 <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Practice Title</label>
@@ -270,6 +299,7 @@ export const PracticeBuilder: React.FC = () => {
                                                 id={drill.instanceId}
                                                 drill={drill}
                                                 onRemove={removeDrillFromPractice}
+                                                onView={setSelectedDrill}
                                             />
                                         ))}
                                     </SortableContext>
@@ -279,6 +309,12 @@ export const PracticeBuilder: React.FC = () => {
                     </div>
                 </div>
             </div>
+
+            {/* Drill Details Modal */}
+            <DrillDetailsModal
+                drill={selectedDrill}
+                onClose={() => setSelectedDrill(null)}
+            />
         </div>
     );
 };
