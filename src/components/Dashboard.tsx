@@ -21,8 +21,8 @@ export const Dashboard: React.FC = () => {
     }, []);
 
     const filteredDrills = drills.filter(d =>
-        d.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        d.description.toLowerCase().includes(searchTerm.toLowerCase())
+        (d.title || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+        (d.description || '').toLowerCase().includes(searchTerm.toLowerCase())
     );
 
     const handleCreateDrill = async (e: React.FormEvent) => {
