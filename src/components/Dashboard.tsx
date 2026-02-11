@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Plus, Search, Filter, Loader2, BookOpen, ChevronDown, ArrowDownAZ, Clock, BarChart3, CalendarDays, Check } from 'lucide-react';
+import { Plus, Search, Filter, Loader2, BookOpen, ChevronDown, ArrowDownAZ, Clock, BarChart3, CalendarDays, Check, Layers } from 'lucide-react';
 import { useStore } from '../store/useStore';
 import { DrillCard } from './DrillCard';
 import type { Drill } from '../services/supabase';
@@ -17,8 +17,11 @@ export const Dashboard: React.FC = () => {
         category: 'Passing',
         tags: []
     });
-    const [sortBy, setSortBy] = useState<'alphabetical' | 'difficulty' | 'duration' | 'newest'>('newest');
+    const [sortBy, setSortBy] = useState<'alphabetical' | 'difficulty' | 'duration' | 'newest' | 'category'>('newest');
+    const [filterCategory, setFilterCategory] = useState<string>('All');
     const [isSortMenuOpen, setIsSortMenuOpen] = useState(false);
+
+    const categories = ['Passing', 'Attacking', 'Setting', 'Serving', 'Defense', 'Blocking', 'Competition'];
 
     const difficultyOrder = { 'Beginner': 0, 'Intermediate': 1, 'Advanced': 2 };
 
@@ -27,10 +30,12 @@ export const Dashboard: React.FC = () => {
     }, []);
 
     const filteredDrills = drills
-        .filter(d =>
-            (d.title || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
-            (d.description || '').toLowerCase().includes(searchTerm.toLowerCase())
-        )
+        .filter(d => {
+            const matchesSearch = (d.title || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+                (d.description || '').toLowerCase().includes(searchTerm.toLowerCase());
+            const matchesCategory = filterCategory === 'All' || d.category === filterCategory;
+            return matchesSearch && matchesCategory;
+        })
         .sort((a, b) => {
             switch (sortBy) {
                 case 'alphabetical':
@@ -39,6 +44,8 @@ export const Dashboard: React.FC = () => {
                     return difficultyOrder[a.difficulty] - difficultyOrder[b.difficulty];
                 case 'duration':
                     return a.duration_minutes - b.duration_minutes;
+                case 'category':
+                    return (a.category || '').localeCompare(b.category || '');
                 case 'newest':
                     return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
                 default:
@@ -135,12 +142,32 @@ export const Dashboard: React.FC = () => {
                                 className="fixed inset-0 z-[60]"
                                 onClick={() => setIsSortMenuOpen(false)}
                             ></div>
-                            <div className="absolute right-0 mt-2 w-56 bg-white rounded-xl shadow-xl border border-gray-100 py-2 z-[70] animate-in fade-in slide-in-from-top-2 duration-200">
-                                <div className="px-3 py-2 text-xs font-bold text-gray-400 uppercase tracking-wider">Sort Drills By</div>
+                            <div className="absolute right-0 mt-2 w-64 bg-white rounded-xl shadow-xl border border-gray-100 py-2 z-[70] animate-in fade-in slide-in-from-top-2 duration-200 overflow-hidden">
+                                <div className="px-4 py-2 text-xs font-bold text-gray-400 uppercase tracking-wider bg-gray-50/50">Filter By Skill</div>
+                                <div className="px-2 py-2 grid grid-cols-1 gap-1">
+                                    <button
+                                        onClick={() => { setFilterCategory('All'); setIsSortMenuOpen(false); }}
+                                        className={`w-full text-left px-3 py-1.5 text-sm rounded-lg transition-colors ${filterCategory === 'All' ? 'bg-stonehill-purple text-white font-semibold' : 'text-gray-600 hover:bg-gray-100'}`}
+                                    >
+                                        All Categories
+                                    </button>
+                                    {categories.map(cat => (
+                                        <button
+                                            key={cat}
+                                            onClick={() => { setFilterCategory(cat); setIsSortMenuOpen(false); }}
+                                            className={`w-full text-left px-3 py-1.5 text-sm rounded-lg transition-colors ${filterCategory === cat ? 'bg-stonehill-purple text-white font-semibold' : 'text-gray-600 hover:bg-gray-100'}`}
+                                        >
+                                            {cat}
+                                        </button>
+                                    ))}
+                                </div>
+
+                                <div className="border-t border-gray-100 my-1"></div>
+                                <div className="px-4 py-2 text-xs font-bold text-gray-400 uppercase tracking-wider bg-gray-50/50">Sort Order</div>
 
                                 <button
                                     onClick={() => { setSortBy('alphabetical'); setIsSortMenuOpen(false); }}
-                                    className={`w-full flex items-center justify-between px-4 py-2.5 text-sm transition-colors ${sortBy === 'alphabetical' ? 'bg-stonehill-purple/5 text-stonehill-purple font-semibold' : 'text-gray-600 hover:bg-gray-50'}`}
+                                    className={`w-full flex items-center justify-between px-4 py-2 text-sm transition-colors ${sortBy === 'alphabetical' ? 'bg-stonehill-purple/5 text-stonehill-purple font-semibold' : 'text-gray-600 hover:bg-gray-50'}`}
                                 >
                                     <div className="flex items-center gap-3">
                                         <ArrowDownAZ className="w-4 h-4" />
@@ -150,8 +177,19 @@ export const Dashboard: React.FC = () => {
                                 </button>
 
                                 <button
+                                    onClick={() => { setSortBy('category'); setIsSortMenuOpen(false); }}
+                                    className={`w-full flex items-center justify-between px-4 py-2 text-sm transition-colors ${sortBy === 'category' ? 'bg-stonehill-purple/5 text-stonehill-purple font-semibold' : 'text-gray-600 hover:bg-gray-50'}`}
+                                >
+                                    <div className="flex items-center gap-3">
+                                        <Layers className="w-4 h-4" />
+                                        Skill Category
+                                    </div>
+                                    {sortBy === 'category' && <Check className="w-4 h-4" />}
+                                </button>
+
+                                <button
                                     onClick={() => { setSortBy('difficulty'); setIsSortMenuOpen(false); }}
-                                    className={`w-full flex items-center justify-between px-4 py-2.5 text-sm transition-colors ${sortBy === 'difficulty' ? 'bg-stonehill-purple/5 text-stonehill-purple font-semibold' : 'text-gray-600 hover:bg-gray-50'}`}
+                                    className={`w-full flex items-center justify-between px-4 py-2 text-sm transition-colors ${sortBy === 'difficulty' ? 'bg-stonehill-purple/5 text-stonehill-purple font-semibold' : 'text-gray-600 hover:bg-gray-50'}`}
                                 >
                                     <div className="flex items-center gap-3">
                                         <BarChart3 className="w-4 h-4" />
@@ -162,7 +200,7 @@ export const Dashboard: React.FC = () => {
 
                                 <button
                                     onClick={() => { setSortBy('duration'); setIsSortMenuOpen(false); }}
-                                    className={`w-full flex items-center justify-between px-4 py-2.5 text-sm transition-colors ${sortBy === 'duration' ? 'bg-stonehill-purple/5 text-stonehill-purple font-semibold' : 'text-gray-600 hover:bg-gray-50'}`}
+                                    className={`w-full flex items-center justify-between px-4 py-2 text-sm transition-colors ${sortBy === 'duration' ? 'bg-stonehill-purple/5 text-stonehill-purple font-semibold' : 'text-gray-600 hover:bg-gray-50'}`}
                                 >
                                     <div className="flex items-center gap-3">
                                         <Clock className="w-4 h-4" />
@@ -173,7 +211,7 @@ export const Dashboard: React.FC = () => {
 
                                 <button
                                     onClick={() => { setSortBy('newest'); setIsSortMenuOpen(false); }}
-                                    className={`w-full flex items-center justify-between px-4 py-2.5 text-sm transition-colors ${sortBy === 'newest' ? 'bg-stonehill-purple/5 text-stonehill-purple font-semibold' : 'text-gray-600 hover:bg-gray-50'}`}
+                                    className={`w-full flex items-center justify-between px-4 py-2 text-sm transition-colors ${sortBy === 'newest' ? 'bg-stonehill-purple/5 text-stonehill-purple font-semibold' : 'text-gray-600 hover:bg-gray-50'}`}
                                 >
                                     <div className="flex items-center gap-3">
                                         <CalendarDays className="w-4 h-4" />
