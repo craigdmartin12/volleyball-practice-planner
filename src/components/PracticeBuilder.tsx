@@ -204,38 +204,53 @@ export const PracticeBuilder: React.FC = () => {
                                 {drills.length}
                             </span>
                         </h3>
-                        <div className="space-y-3 h-[calc(100vh-320px)] overflow-y-auto pr-2 custom-scrollbar">
-                            {drills.map((drill) => (
-                                <div key={drill.id} className="relative group">
-                                    <button
-                                        onClick={() => addDrillToPractice(drill)}
-                                        className="w-full text-left bg-white border border-gray-200 rounded-xl p-4 hover:border-stonehill-purple hover:shadow-md transition-all group/card flex items-start justify-between pr-10"
-                                    >
-                                        <div className="flex-1">
-                                            <h4 className="font-bold text-gray-800 text-sm group-hover/card:text-stonehill-purple transition-colors">{drill.title}</h4>
-                                            <div className="flex items-center gap-2 mt-1">
-                                                <span className="text-[10px] font-bold text-stonehill-purple border border-stonehill-purple/20 px-1.5 py-0.5 rounded uppercase font-mono">
-                                                    {drill.difficulty[0]}
-                                                </span>
-                                                <span className="text-[10px] text-gray-500 flex items-center gap-1">
-                                                    <Clock className="w-3 h-3" /> {drill.duration_minutes}m
-                                                </span>
-                                            </div>
+                        <div className="space-y-6 h-[calc(100vh-320px)] overflow-y-auto pr-2 custom-scrollbar">
+                            {['Passing', 'Attacking', 'Setting', 'Serving', 'Defense', 'Blocking', 'Competition'].map((category) => {
+                                const filteredDrills = drills.filter(d => d.category === category);
+                                if (filteredDrills.length === 0) return null;
+
+                                return (
+                                    <div key={category} className="space-y-2">
+                                        <h4 className="text-[10px] font-black text-stonehill-purple/40 uppercase tracking-[0.2em] px-1 flex items-center gap-2">
+                                            {category}
+                                            <div className="h-[1px] flex-1 bg-stonehill-purple/10"></div>
+                                        </h4>
+                                        <div className="space-y-2">
+                                            {filteredDrills.map((drill) => (
+                                                <div key={drill.id} className="relative group">
+                                                    <button
+                                                        onClick={() => addDrillToPractice(drill)}
+                                                        className="w-full text-left bg-white border border-gray-100 rounded-xl p-3 hover:border-stonehill-purple/30 hover:shadow-sm transition-all group/card flex items-start justify-between pr-8"
+                                                    >
+                                                        <div className="flex-1">
+                                                            <h4 className="font-bold text-gray-800 text-[13px] group-hover/card:text-stonehill-purple transition-colors line-clamp-1">{drill.title}</h4>
+                                                            <div className="flex items-center gap-2 mt-0.5">
+                                                                <span className="text-[9px] font-bold text-stonehill-purple/60 uppercase">
+                                                                    {drill.difficulty}
+                                                                </span>
+                                                                <span className="text-[9px] text-gray-400 flex items-center gap-1">
+                                                                    <Clock className="w-2.5 h-2.5" /> {drill.duration_minutes}m
+                                                                </span>
+                                                            </div>
+                                                        </div>
+                                                        <ChevronRight className="w-3.5 h-3.5 text-gray-300 group-hover/card:text-stonehill-purple group-hover/card:translate-x-1 transition-all mt-0.5" />
+                                                    </button>
+                                                    <button
+                                                        onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            navigate(`/drill/${drill.id}`);
+                                                        }}
+                                                        className="absolute right-2 top-1/2 -translate-y-1/2 p-2 text-gray-300 hover:text-stonehill-purple hover:bg-stonehill-purple/5 rounded-lg transition-all opacity-0 group-hover:opacity-100"
+                                                        title="View Details"
+                                                    >
+                                                        <Info className="w-4 h-4" />
+                                                    </button>
+                                                </div>
+                                            ))}
                                         </div>
-                                        <ChevronRight className="w-4 h-4 text-gray-300 group-hover/card:text-stonehill-purple group-hover/card:translate-x-1 transition-all" />
-                                    </button>
-                                    <button
-                                        onClick={(e) => {
-                                            e.stopPropagation();
-                                            navigate(`/drill/${drill.id}`);
-                                        }}
-                                        className="absolute right-3 top-1/2 -translate-y-1/2 p-2 text-gray-300 hover:text-stonehill-purple hover:bg-stonehill-purple/5 rounded-lg transition-all opacity-0 group-hover:opacity-100"
-                                        title="View Details"
-                                    >
-                                        <Info className="w-4 h-4" />
-                                    </button>
-                                </div>
-                            ))}
+                                    </div>
+                                );
+                            })}
                         </div>
                     </div>
                 </div>
