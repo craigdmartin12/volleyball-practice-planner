@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Clock, Tag, MoreVertical, ChevronDown, ChevronUp, ExternalLink } from 'lucide-react';
+import { Clock, Tag, MoreVertical, ChevronDown, ChevronUp, ExternalLink, Pencil } from 'lucide-react';
 import type { Drill } from '../services/supabase';
 
 interface DrillCardProps {
@@ -9,7 +9,7 @@ interface DrillCardProps {
     onDelete?: (id: string) => void;
 }
 
-export const DrillCard: React.FC<DrillCardProps> = ({ drill }) => {
+export const DrillCard: React.FC<DrillCardProps> = ({ drill, onEdit }) => {
     const navigate = useNavigate();
     const [isExpanded, setIsExpanded] = useState(false);
 
@@ -34,6 +34,11 @@ export const DrillCard: React.FC<DrillCardProps> = ({ drill }) => {
         e.stopPropagation();
         console.log('[DrillCard] Navigating to details page:', drill.id);
         navigate(`/drill/${drill.id}`);
+    };
+
+    const handleEdit = (e: React.MouseEvent) => {
+        e.stopPropagation();
+        if (onEdit) onEdit(drill);
     };
 
     return (
@@ -65,6 +70,13 @@ export const DrillCard: React.FC<DrillCardProps> = ({ drill }) => {
                     </div>
                 </div>
                 <div className="flex items-center gap-1 flex-shrink-0">
+                    <button
+                        onClick={handleEdit}
+                        className="p-2 rounded-xl text-gray-400 hover:text-stonehill-gold hover:bg-stonehill-gold/10 transition-colors"
+                        title="Edit Drill"
+                    >
+                        <Pencil className="w-4 h-4" />
+                    </button>
                     <button
                         onClick={() => setIsExpanded(!isExpanded)}
                         className={`p-2 rounded-xl transition-colors ${isExpanded ? 'bg-stonehill-purple text-white' : 'bg-gray-50 text-gray-400 hover:text-stonehill-purple'}`}

@@ -5,9 +5,10 @@ import { DrillCard } from './DrillCard';
 import type { Drill } from '../services/supabase';
 
 export const Dashboard: React.FC = () => {
-    const { drills, loading, fetchDrills, addDrill } = useStore();
+    const { drills, loading, fetchDrills, addDrill, updateDrill } = useStore();
     const [searchTerm, setSearchTerm] = useState('');
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+    const [editingDrillId, setEditingDrillId] = useState<string | null>(null);
     const [newDrill, setNewDrill] = useState<Partial<Drill>>({
         title: '',
         description: '',
@@ -45,10 +46,18 @@ export const Dashboard: React.FC = () => {
             }
         });
 
-    const handleCreateDrill = async (e: React.FormEvent) => {
+    const handleSaveDrill = async (e: React.FormEvent) => {
         e.preventDefault();
-        await addDrill(newDrill as any);
-        setIsCreateModalOpen(false);
+        if (editingDrillId) {
+            await updateDrill(editingDrillId, newDrill);
+        } else {
+            await addDrill(newDrill as any);
+        }
+        closeModal();
+    };
+
+    const openCreateModal = () => {
+        setEditingDrillId(null);
         setNewDrill({
             title: '',
             description: '',
@@ -57,6 +66,25 @@ export const Dashboard: React.FC = () => {
             category: 'Passing',
             tags: []
         });
+        setIsCreateModalOpen(true);
+    };
+
+    const openEditModal = (drill: Drill) => {
+        setEditingDrillId(drill.id);
+        setNewDrill({
+            title: drill.title,
+            description: drill.description,
+            duration_minutes: drill.duration_minutes,
+            difficulty: drill.difficulty,
+            category: drill.category,
+            tags: drill.tags
+        });
+        setIsCreateModalOpen(true);
+    };
+
+    const closeModal = () => {
+        setIsCreateModalOpen(false);
+        setEditingDrillId(null);
     };
 
     return (
@@ -70,7 +98,7 @@ export const Dashboard: React.FC = () => {
                     </p>
                 </div>
                 <button
-                    onClick={() => setIsCreateModalOpen(true)}
+                    onClick={openCreateModal}
                     className="bg-stonehill-purple hover:bg-stonehill-purple/90 text-white px-5 py-2.5 rounded-xl font-bold flex items-center gap-2 shadow-lg shadow-stonehill-purple/20 transition-all hover:translate-y-[-2px] active:translate-y-0"
                 >
                     <Plus className="w-5 h-5" />
@@ -172,6 +200,7 @@ export const Dashboard: React.FC = () => {
                             <DrillCard
                                 key={drill.id}
                                 drill={drill}
+                                onEdit={openEditModal}
                             />
                         );
                     })}
@@ -189,14 +218,14 @@ export const Dashboard: React.FC = () => {
             {/* Basic Create Modal */}
             {isCreateModalOpen && (
                 <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
-                    <div className="absolute inset-0 bg-stonehill-purple/40 backdrop-blur-sm" onClick={() => setIsCreateModalOpen(false)}></div>
+                    <div className="absolute inset-0 bg-stonehill-purple/40 backdrop-blur-sm" onClick={closeModal}></div>
                     <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg relative z-10 overflow-hidden border border-white/20 animate-in fade-in zoom-in duration-200">
                         <div className="bg-stonehill-gold p-6 text-stonehill-purple">
-                            <h3 className="text-xl font-bold">New Drill Details <span className="text-[10px] bg-stonehill-purple text-white px-2 py-0.5 rounded ml-2">UPDATE 1.1</span></h3>
-                            <p className="text-stonehill-purple/70 text-sm mt-1">Categorize and save your drills</p>
+                            <h3 className="text-xl font-bold">{editingDrillId ? 'Edit Drill' : 'New Drill Details'} <span className="text-[10px] bg-stonehill-purple text-white px-2 py-0.5 rounded ml-2">{editingDrillId ? 'UPDATE' : 'NEW'}</span></h3>
+                            <p className="text-stonehill-purple/70 text-sm mt-1">{editingDrillId ? 'Update your drill information' : 'Add a new drill to your professional library'}</p>
                         </div>
 
-                        <form onSubmit={handleCreateDrill} className="p-6 space-y-4">
+                        <form onSubmit={handleSaveDrill} className="p-6 space-y-4">
                             <div>
                                 <label className="block text-sm font-bold text-gray-700 mb-1">Drill Title</label>
                                 <input
@@ -265,7 +294,7 @@ export const Dashboard: React.FC = () => {
                             <div className="flex gap-3 mt-8">
                                 <button
                                     type="button"
-                                    onClick={() => setIsCreateModalOpen(false)}
+                                    onClick={closeModal}
                                     className="flex-1 border border-gray-200 hover:bg-gray-50 text-gray-700 font-bold py-3 rounded-xl transition-colors"
                                 >
                                     Cancel
@@ -274,7 +303,7 @@ export const Dashboard: React.FC = () => {
                                     type="submit"
                                     className="flex-1 bg-stonehill-gold hover:bg-stonehill-gold/90 text-stonehill-purple font-bold py-3 rounded-xl shadow-lg transition-all"
                                 >
-                                    Save Drill
+                                    {editingDrillId ? 'Update Drill' : 'Save Drill'}
                                 </button>
                             </div>
                         </form>

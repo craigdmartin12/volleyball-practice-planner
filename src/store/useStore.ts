@@ -10,6 +10,7 @@ interface AppState {
     fetchDrills: () => Promise<void>;
     fetchPractices: () => Promise<void>;
     addDrill: (drill: Omit<Drill, 'id' | 'user_id' | 'created_at'>) => Promise<void>;
+    updateDrill: (id: string, drill: Partial<Drill>) => Promise<void>;
     addPractice: (practice: Omit<Practice, 'id' | 'user_id' | 'created_at'>) => Promise<void>;
 }
 
@@ -44,6 +45,19 @@ export const useStore = create<AppState>((set) => ({
         try {
             const newDrill = await api.drills.create(drill);
             set((state) => ({ drills: [newDrill, ...state.drills], loading: false }));
+        } catch (error: any) {
+            set({ error: error.message, loading: false });
+        }
+    },
+
+    updateDrill: async (id, drill) => {
+        set({ loading: true, error: null });
+        try {
+            const updated = await api.drills.update(id, drill);
+            set((state) => ({
+                drills: state.drills.map((d) => (d.id === id ? updated : d)),
+                loading: false
+            }));
         } catch (error: any) {
             set({ error: error.message, loading: false });
         }
