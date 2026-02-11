@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Plus, Search, Filter, Loader2, BookOpen } from 'lucide-react';
+import { Plus, Search, Filter, Loader2, BookOpen, ChevronDown, ArrowDownAZ, Clock, BarChart3, CalendarDays, Check } from 'lucide-react';
 import { useStore } from '../store/useStore';
 import { DrillCard } from './DrillCard';
 import type { Drill } from '../services/supabase';
@@ -15,15 +15,34 @@ export const Dashboard: React.FC = () => {
         difficulty: 'Intermediate',
         tags: []
     });
+    const [sortBy, setSortBy] = useState<'alphabetical' | 'difficulty' | 'duration' | 'newest'>('newest');
+    const [isSortMenuOpen, setIsSortMenuOpen] = useState(false);
+
+    const difficultyOrder = { 'Beginner': 0, 'Intermediate': 1, 'Advanced': 2 };
 
     useEffect(() => {
         fetchDrills();
     }, []);
 
-    const filteredDrills = drills.filter(d =>
-        (d.title || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
-        (d.description || '').toLowerCase().includes(searchTerm.toLowerCase())
-    );
+    const filteredDrills = drills
+        .filter(d =>
+            (d.title || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+            (d.description || '').toLowerCase().includes(searchTerm.toLowerCase())
+        )
+        .sort((a, b) => {
+            switch (sortBy) {
+                case 'alphabetical':
+                    return a.title.localeCompare(b.title);
+                case 'difficulty':
+                    return difficultyOrder[a.difficulty] - difficultyOrder[b.difficulty];
+                case 'duration':
+                    return a.duration_minutes - b.duration_minutes;
+                case 'newest':
+                    return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+                default:
+                    return 0;
+            }
+        });
 
     const handleCreateDrill = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -68,10 +87,74 @@ export const Dashboard: React.FC = () => {
                         className="w-full bg-white border border-gray-200 rounded-xl py-3 pl-11 pr-4 focus:outline-none focus:ring-2 focus:ring-stonehill-purple/20 focus:border-stonehill-purple transition-all shadow-sm"
                     />
                 </div>
-                <button className="flex items-center gap-2 px-4 py-3 bg-white border border-gray-200 rounded-xl text-gray-600 hover:bg-gray-50 transition-colors shadow-sm font-medium">
-                    <Filter className="w-4 h-4" />
-                    Filters
-                </button>
+                <div className="relative">
+                    <button
+                        onClick={() => setIsSortMenuOpen(!isSortMenuOpen)}
+                        className="flex items-center gap-2 px-4 py-3 bg-white border border-gray-200 rounded-xl text-gray-600 hover:bg-gray-50 transition-colors shadow-sm font-medium min-w-[140px] justify-between"
+                    >
+                        <div className="flex items-center gap-2">
+                            <Filter className="w-4 h-4" />
+                            <span>Sort & Filter</span>
+                        </div>
+                        <ChevronDown className={`w-4 h-4 transition-transform ${isSortMenuOpen ? 'rotate-180' : ''}`} />
+                    </button>
+
+                    {isSortMenuOpen && (
+                        <>
+                            <div
+                                className="fixed inset-0 z-[60]"
+                                onClick={() => setIsSortMenuOpen(false)}
+                            ></div>
+                            <div className="absolute right-0 mt-2 w-56 bg-white rounded-xl shadow-xl border border-gray-100 py-2 z-[70] animate-in fade-in slide-in-from-top-2 duration-200">
+                                <div className="px-3 py-2 text-xs font-bold text-gray-400 uppercase tracking-wider">Sort Drills By</div>
+
+                                <button
+                                    onClick={() => { setSortBy('alphabetical'); setIsSortMenuOpen(false); }}
+                                    className={`w-full flex items-center justify-between px-4 py-2.5 text-sm transition-colors ${sortBy === 'alphabetical' ? 'bg-stonehill-purple/5 text-stonehill-purple font-semibold' : 'text-gray-600 hover:bg-gray-50'}`}
+                                >
+                                    <div className="flex items-center gap-3">
+                                        <ArrowDownAZ className="w-4 h-4" />
+                                        Alphabetical (A-Z)
+                                    </div>
+                                    {sortBy === 'alphabetical' && <Check className="w-4 h-4" />}
+                                </button>
+
+                                <button
+                                    onClick={() => { setSortBy('difficulty'); setIsSortMenuOpen(false); }}
+                                    className={`w-full flex items-center justify-between px-4 py-2.5 text-sm transition-colors ${sortBy === 'difficulty' ? 'bg-stonehill-purple/5 text-stonehill-purple font-semibold' : 'text-gray-600 hover:bg-gray-50'}`}
+                                >
+                                    <div className="flex items-center gap-3">
+                                        <BarChart3 className="w-4 h-4" />
+                                        Difficulty Level
+                                    </div>
+                                    {sortBy === 'difficulty' && <Check className="w-4 h-4" />}
+                                </button>
+
+                                <button
+                                    onClick={() => { setSortBy('duration'); setIsSortMenuOpen(false); }}
+                                    className={`w-full flex items-center justify-between px-4 py-2.5 text-sm transition-colors ${sortBy === 'duration' ? 'bg-stonehill-purple/5 text-stonehill-purple font-semibold' : 'text-gray-600 hover:bg-gray-50'}`}
+                                >
+                                    <div className="flex items-center gap-3">
+                                        <Clock className="w-4 h-4" />
+                                        Duration
+                                    </div>
+                                    {sortBy === 'duration' && <Check className="w-4 h-4" />}
+                                </button>
+
+                                <button
+                                    onClick={() => { setSortBy('newest'); setIsSortMenuOpen(false); }}
+                                    className={`w-full flex items-center justify-between px-4 py-2.5 text-sm transition-colors ${sortBy === 'newest' ? 'bg-stonehill-purple/5 text-stonehill-purple font-semibold' : 'text-gray-600 hover:bg-gray-50'}`}
+                                >
+                                    <div className="flex items-center gap-3">
+                                        <CalendarDays className="w-4 h-4" />
+                                        Newest to Oldest
+                                    </div>
+                                    {sortBy === 'newest' && <Check className="w-4 h-4" />}
+                                </button>
+                            </div>
+                        </>
+                    )}
+                </div>
             </div>
 
             {loading && drills.length === 0 ? (
