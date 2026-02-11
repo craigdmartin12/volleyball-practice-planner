@@ -63,7 +63,7 @@ export const Dashboard: React.FC = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
             <header className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
                 <div>
-                    <h1 className="text-3xl font-extrabold text-gray-900 tracking-tight">Drill Library</h1>
+                    <h1 className="text-3xl font-extrabold text-gray-900 tracking-tight">Drill Library <span className="text-[10px] font-bold text-stonehill-gold bg-stonehill-gold/10 px-2 py-0.5 rounded ml-2 align-middle">PRO V1.1</span></h1>
                     <p className="text-gray-500 mt-1 flex items-center gap-2">
                         <BookOpen className="w-4 h-4 text-stonehill-purple" />
                         Manage volleyball drills and training sessions
@@ -191,9 +191,9 @@ export const Dashboard: React.FC = () => {
                 <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
                     <div className="absolute inset-0 bg-stonehill-purple/40 backdrop-blur-sm" onClick={() => setIsCreateModalOpen(false)}></div>
                     <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg relative z-10 overflow-hidden border border-white/20 animate-in fade-in zoom-in duration-200">
-                        <div className="bg-stonehill-purple p-6 text-white">
-                            <h3 className="text-xl font-bold">New Drill Details</h3>
-                            <p className="text-blue-200 text-sm mt-1">Add a new drill to your professional library</p>
+                        <div className="bg-stonehill-gold p-6 text-stonehill-purple">
+                            <h3 className="text-xl font-bold">New Drill Details <span className="text-[10px] bg-stonehill-purple text-white px-2 py-0.5 rounded ml-2">UPDATE 1.1</span></h3>
+                            <p className="text-stonehill-purple/70 text-sm mt-1">Categorize and save your drills</p>
                         </div>
 
                         <form onSubmit={handleCreateDrill} className="p-6 space-y-4">
