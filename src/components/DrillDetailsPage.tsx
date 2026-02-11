@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Clock, Tag, BookOpen, Share2, Loader2, Pencil } from 'lucide-react';
+import { ArrowLeft, Clock, Tag, BookOpen, Share2, Loader2 } from 'lucide-react';
 import { useStore } from '../store/useStore';
 
 export const DrillDetailsPage: React.FC = () => {
