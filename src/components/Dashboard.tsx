@@ -13,6 +13,7 @@ export const Dashboard: React.FC = () => {
         description: '',
         duration_minutes: 10,
         difficulty: 'Intermediate',
+        category: 'Passing',
         tags: []
     });
     const [sortBy, setSortBy] = useState<'alphabetical' | 'difficulty' | 'duration' | 'newest'>('newest');
@@ -53,6 +54,7 @@ export const Dashboard: React.FC = () => {
             description: '',
             duration_minutes: 10,
             difficulty: 'Intermediate',
+            category: 'Passing',
             tags: []
         });
     };
@@ -230,6 +232,23 @@ export const Dashboard: React.FC = () => {
                                         <option value="Advanced">Advanced</option>
                                     </select>
                                 </div>
+                            </div>
+
+                            <div>
+                                <label className="block text-sm font-bold text-gray-700 mb-1">Skill Category</label>
+                                <select
+                                    value={newDrill.category}
+                                    onChange={e => setNewDrill({ ...newDrill, category: e.target.value as any })}
+                                    className="w-full border border-gray-200 rounded-lg px-4 py-2 focus:ring-2 focus:ring-stonehill-purple/20 focus:border-stonehill-purple outline-none bg-white font-medium"
+                                >
+                                    <option value="Passing">Passing</option>
+                                    <option value="Attacking">Attacking</option>
+                                    <option value="Setting">Setting</option>
+                                    <option value="Serving">Serving</option>
+                                    <option value="Defense">Defense</option>
+                                    <option value="Blocking">Blocking</option>
+                                    <option value="Competition">Competition</option>
+                                </select>
                             </div>
 
                             <div>

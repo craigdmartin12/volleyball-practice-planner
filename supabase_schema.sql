@@ -1,6 +1,11 @@
--- Create custom types
 DO $$ BEGIN
     CREATE TYPE drill_difficulty AS ENUM ('Beginner', 'Intermediate', 'Advanced');
+EXCEPTION
+    WHEN duplicate_object THEN null;
+END $$;
+
+DO $$ BEGIN
+    CREATE TYPE drill_category AS ENUM ('Passing', 'Attacking', 'Setting', 'Serving', 'Defense', 'Blocking', 'Competition');
 EXCEPTION
     WHEN duplicate_object THEN null;
 END $$;
@@ -16,6 +21,7 @@ CREATE TABLE IF NOT EXISTS drills (
     description TEXT,
     duration_minutes INTEGER NOT NULL DEFAULT 5,
     difficulty drill_difficulty NOT NULL DEFAULT 'Intermediate',
+    category drill_category NOT NULL DEFAULT 'Passing',
     tags TEXT[] DEFAULT '{}',
     diagram_url TEXT,
     created_at TIMESTAMPTZ DEFAULT NOW()

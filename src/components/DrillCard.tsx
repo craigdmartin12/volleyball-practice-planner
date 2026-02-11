@@ -49,11 +49,16 @@ export const DrillCard: React.FC<DrillCardProps> = ({ drill }) => {
                     <h3 className={`font-black text-gray-900 leading-tight transition-colors ${isExpanded ? 'text-xl text-stonehill-purple' : 'text-base group-hover:text-stonehill-purple line-clamp-1'}`}>
                         {drill.title}
                     </h3>
-                    <div className="flex items-center gap-3 mt-2">
+                    <div className="flex flex-wrap items-center gap-2 mt-2">
                         <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${getDifficultyColor(drill.difficulty)} uppercase tracking-wider`}>
                             {drill.difficulty || 'Intermediate'}
                         </span>
-                        <div className="flex items-center gap-1 text-[11px] font-medium text-gray-500">
+                        {drill.category && (
+                            <span className="text-[10px] font-bold px-2 py-0.5 rounded-full border border-stonehill-purple/20 bg-stonehill-purple/[0.03] text-stonehill-purple uppercase tracking-wider">
+                                {drill.category}
+                            </span>
+                        )}
+                        <div className="flex items-center gap-1 text-[11px] font-medium text-gray-500 ml-1">
                             <Clock className="w-3.5 h-3.5" />
                             {drill.duration_minutes || 5} min
                         </div>
