@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
     DndContext,
@@ -103,14 +103,27 @@ const SortablePracticeDrill: React.FC<SortableItemProps> = ({ id, drill, onRemov
 };
 
 export const PracticeBuilder: React.FC = () => {
-    const { drills, fetchDrills } = useStore();
+    const {
+        drills,
+        fetchDrills,
+        builderDrills,
+        builderTitle,
+        builderDate,
+        setBuilderDrills,
+        setBuilderTitle,
+        setBuilderDate,
+        resetBuilder
+    } = useStore();
     const navigate = useNavigate();
-    const [practiceDrills, setPracticeDrills] = useState<(Drill & { instanceId: string })[]>([]);
-    const [title, setTitle] = useState('New Practice Plan');
-    const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
 
     useEffect(() => {
         fetchDrills();
+
+        // Auto-reset check on mount
+        const today = new Date().toISOString().split('T')[0];
+        if (builderDate < today) {
+            resetBuilder();
+        }
     }, []);
 
     const sensors = useSensors(
@@ -120,38 +133,37 @@ export const PracticeBuilder: React.FC = () => {
         })
     );
 
-    const totalTime = practiceDrills.reduce((acc, d) => acc + d.duration_minutes, 0);
+    const totalTime = builderDrills.reduce((acc, d) => acc + d.duration_minutes, 0);
 
     const addDrillToPractice = (drill: Drill) => {
         const instanceId = `${drill.id}-${Date.now()}`;
-        setPracticeDrills([...practiceDrills, { ...drill, instanceId }]);
+        setBuilderDrills([...builderDrills, { ...drill, instanceId }]);
     };
 
     const removeDrillFromPractice = (instanceId: string) => {
-        setPracticeDrills(practiceDrills.filter(d => d.instanceId !== instanceId));
+        setBuilderDrills(builderDrills.filter(d => d.instanceId !== instanceId));
     };
 
     const handleDragEnd = (event: any) => {
         const { active, over } = event;
 
         if (active.id !== over.id) {
-            setPracticeDrills((items) => {
-                const oldIndex = items.findIndex((i) => i.instanceId === active.id);
-                const newIndex = items.findIndex((i) => i.instanceId === over.id);
-                return arrayMove(items, oldIndex, newIndex);
-            });
+            const oldIndex = builderDrills.findIndex((i) => i.instanceId === active.id);
+            const newIndex = builderDrills.findIndex((i) => i.instanceId === over.id);
+            setBuilderDrills(arrayMove(builderDrills, oldIndex, newIndex));
         }
     };
 
     const handleSave = async () => {
         try {
             const practice = await api.practices.create({
-                title,
-                practice_date: date,
+                title: builderTitle,
+                practice_date: builderDate,
                 notes: ''
             });
-            await api.practices.updateItems(practice.id, practiceDrills.map(d => d.id));
-            alert('Practice saved successfully!');
+            await api.practices.updateItems(practice.id, builderDrills.map(d => d.id));
+            alert('Practice saved successfully! Builder cleared.');
+            resetBuilder();
         } catch (err: any) {
             alert(`Error saving practice: ${err.message}`);
         }
@@ -236,8 +248,8 @@ export const PracticeBuilder: React.FC = () => {
                                 <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Practice Title</label>
                                 <input
                                     type="text"
-                                    value={title}
-                                    onChange={(e) => setTitle(e.target.value)}
+                                    value={builderTitle}
+                                    onChange={(e) => setBuilderTitle(e.target.value)}
                                     className="text-xl font-bold text-gray-900 w-full focus:outline-none border-b-2 border-transparent focus:border-stonehill-purple transition-all pb-1"
                                 />
                             </div>
@@ -247,8 +259,8 @@ export const PracticeBuilder: React.FC = () => {
                                     <Calendar className="w-4 h-4" />
                                     <input
                                         type="date"
-                                        value={date}
-                                        onChange={(e) => setDate(e.target.value)}
+                                        value={builderDate}
+                                        onChange={(e) => setBuilderDate(e.target.value)}
                                         className="bg-transparent focus:outline-none cursor-pointer"
                                     />
                                 </div>
@@ -264,7 +276,7 @@ export const PracticeBuilder: React.FC = () => {
                                 <div className="h-8 w-[1px] bg-stonehill-purple/20"></div>
                                 <div className="flex flex-col">
                                     <span className="text-[10px] font-bold text-stonehill-purple uppercase tracking-tighter">Activity Count</span>
-                                    <span className="text-2xl font-black text-stonehill-purple">{practiceDrills.length} <small className="text-sm font-normal">items</small></span>
+                                    <span className="text-2xl font-black text-stonehill-purple">{builderDrills.length} <small className="text-sm font-normal">items</small></span>
                                 </div>
                             </div>
 
@@ -277,7 +289,7 @@ export const PracticeBuilder: React.FC = () => {
                         </div>
 
                         <div className="space-y-3 min-h-[300px] relative">
-                            {practiceDrills.length === 0 ? (
+                            {builderDrills.length === 0 ? (
                                 <div className="absolute inset-0 flex flex-col items-center justify-center text-gray-400 bg-gray-50/50 rounded-xl border-2 border-dashed border-gray-200">
                                     <Plus className="w-10 h-10 mb-2 opacity-20" />
                                     <p className="font-medium text-sm">Add drills to your practice timeline</p>
@@ -289,10 +301,10 @@ export const PracticeBuilder: React.FC = () => {
                                     onDragEnd={handleDragEnd}
                                 >
                                     <SortableContext
-                                        items={practiceDrills.map(d => d.instanceId)}
+                                        items={builderDrills.map(d => d.instanceId)}
                                         strategy={verticalListSortingStrategy}
                                     >
-                                        {practiceDrills.map((drill) => (
+                                        {builderDrills.map((drill) => (
                                             <SortablePracticeDrill
                                                 key={drill.instanceId}
                                                 id={drill.instanceId}
