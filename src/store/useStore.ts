@@ -11,6 +11,7 @@ interface AppState {
     fetchPractices: () => Promise<void>;
     addDrill: (drill: Omit<Drill, 'id' | 'user_id' | 'created_at'>) => Promise<void>;
     updateDrill: (id: string, drill: Partial<Drill>) => Promise<void>;
+    deleteDrill: (id: string) => Promise<void>;
     addPractice: (practice: Omit<Practice, 'id' | 'user_id' | 'created_at'>) => Promise<void>;
     // Builder Persistence
     builderDrills: (Drill & { instanceId: string })[];
@@ -107,6 +108,19 @@ export const useStore = create<AppState>((set, get) => ({
             const updated = await api.drills.update(id, drill);
             set((state) => ({
                 drills: state.drills.map((d) => (d.id === id ? updated : d)),
+                loading: false
+            }));
+        } catch (error: any) {
+            set({ error: error.message, loading: false });
+        }
+    },
+
+    deleteDrill: async (id) => {
+        set({ loading: true, error: null });
+        try {
+            await api.drills.delete(id);
+            set((state) => ({
+                drills: state.drills.filter((d) => d.id !== id),
                 loading: false
             }));
         } catch (error: any) {

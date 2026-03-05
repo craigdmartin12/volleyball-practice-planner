@@ -5,7 +5,7 @@ import { DrillCard } from './DrillCard';
 import type { Drill } from '../services/supabase';
 
 export const Dashboard: React.FC = () => {
-    const { drills, loading, fetchDrills, addDrill, updateDrill } = useStore();
+    const { drills, loading, fetchDrills, addDrill, updateDrill, deleteDrill } = useStore();
     const [searchTerm, setSearchTerm] = useState('');
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
     const [editingDrillId, setEditingDrillId] = useState<string | null>(null);
@@ -239,6 +239,7 @@ export const Dashboard: React.FC = () => {
                                 key={drill.id}
                                 drill={drill}
                                 onEdit={openEditModal}
+                                onDelete={deleteDrill}
                             />
                         );
                     })}

@@ -1,12 +1,12 @@
 import React, { useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Clock, Tag, BookOpen, Share2, Loader2 } from 'lucide-react';
+import { ArrowLeft, Clock, Tag, BookOpen, Share2, Loader2, Trash2 } from 'lucide-react';
 import { useStore } from '../store/useStore';
 
 export const DrillDetailsPage: React.FC = () => {
     const { id } = useParams<{ id: string }>();
     const navigate = useNavigate();
-    const { drills, loading, fetchDrills } = useStore();
+    const { drills, loading, fetchDrills, deleteDrill } = useStore();
 
     useEffect(() => {
         console.log('[DrillDetailsPage] Mounted. ID:', id, 'Drills count:', drills.length);
@@ -124,10 +124,22 @@ export const DrillDetailsPage: React.FC = () => {
                                 </div>
                                 <div className="grid grid-cols-1 gap-3">
                                     <button
-                                        className="w-full py-3 px-4 bg-gray-50 hover:bg-gray-100 text-gray-700 font-bold rounded-xl border border-gray-200 transition-all text-sm flex items-center justify-center gap-2"
+                                        className="w-full py-3 px-4 bg-gray-50 hover:bg-rose-50 text-gray-700 hover:text-rose-600 font-bold rounded-xl border border-gray-200 hover:border-rose-100 transition-all text-sm flex items-center justify-center gap-2"
                                         onClick={() => window.print()}
                                     >
                                         Print Drill Card
+                                    </button>
+                                    <button
+                                        className="w-full py-3 px-4 bg-white hover:bg-rose-600 text-rose-600 hover:text-white font-bold rounded-xl border-2 border-rose-600/10 hover:border-rose-600 transition-all text-sm flex items-center justify-center gap-2"
+                                        onClick={async () => {
+                                            if (window.confirm(`Are you sure you want to permanently delete "${drill.title}"?`)) {
+                                                await deleteDrill(drill.id);
+                                                navigate('/');
+                                            }
+                                        }}
+                                    >
+                                        <Trash2 className="w-4 h-4" />
+                                        Delete Drill
                                     </button>
                                 </div>
                             </div>

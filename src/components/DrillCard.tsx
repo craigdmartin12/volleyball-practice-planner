@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Clock, Tag, MoreVertical, ChevronDown, ChevronUp, ExternalLink, Pencil } from 'lucide-react';
+import { Clock, Tag, ChevronDown, ChevronUp, ExternalLink, Pencil, Trash2 } from 'lucide-react';
 import type { Drill } from '../services/supabase';
 
 interface DrillCardProps {
@@ -9,7 +9,7 @@ interface DrillCardProps {
     onDelete?: (id: string) => void;
 }
 
-export const DrillCard: React.FC<DrillCardProps> = ({ drill, onEdit }) => {
+export const DrillCard: React.FC<DrillCardProps> = ({ drill, onEdit, onDelete }) => {
     const navigate = useNavigate();
     const [isExpanded, setIsExpanded] = useState(false);
 
@@ -39,6 +39,13 @@ export const DrillCard: React.FC<DrillCardProps> = ({ drill, onEdit }) => {
     const handleEdit = (e: React.MouseEvent) => {
         e.stopPropagation();
         if (onEdit) onEdit(drill);
+    };
+
+    const handleDelete = (e: React.MouseEvent) => {
+        e.stopPropagation();
+        if (onDelete && window.confirm(`Are you sure you want to delete "${drill.title}"?`)) {
+            onDelete(drill.id);
+        }
     };
 
     return (
@@ -84,10 +91,11 @@ export const DrillCard: React.FC<DrillCardProps> = ({ drill, onEdit }) => {
                         {isExpanded ? <ChevronUp className="w-5 h-5" /> : <ChevronDown className="w-5 h-5" />}
                     </button>
                     <button
-                        className="text-gray-400 hover:text-gray-600 p-2 rounded-xl hover:bg-gray-50"
-                        onClick={(e) => e.stopPropagation()}
+                        className="text-gray-400 hover:text-rose-600 p-2 rounded-xl hover:bg-rose-50 transition-colors"
+                        onClick={handleDelete}
+                        title="Delete Drill"
                     >
-                        <MoreVertical className="w-4 h-4" />
+                        <Trash2 className="w-4 h-4" />
                     </button>
                 </div>
             </div>
