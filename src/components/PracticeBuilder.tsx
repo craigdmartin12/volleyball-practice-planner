@@ -205,7 +205,7 @@ export const PracticeBuilder: React.FC = () => {
                             </span>
                         </h3>
                         <div className="space-y-6 h-[calc(100vh-320px)] overflow-y-auto pr-2 custom-scrollbar">
-                            {['Passing', 'Attacking', 'Setting', 'Serving', 'Defense', 'Blocking', 'Competition'].map((category) => {
+                            {['Passing', 'Attacking', 'Setting', 'Serving', 'Defense', 'Blocking', 'Competition', 'Warm-up'].map((category) => {
                                 const filteredDrills = drills.filter(d => d.category === category);
                                 if (filteredDrills.length === 0) return null;
 

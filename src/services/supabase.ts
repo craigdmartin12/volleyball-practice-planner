@@ -16,7 +16,7 @@ export type Drill = {
     description: string;
     duration_minutes: number;
     difficulty: 'Beginner' | 'Intermediate' | 'Advanced';
-    category: 'Passing' | 'Attacking' | 'Setting' | 'Serving' | 'Defense' | 'Blocking' | 'Competition';
+    category: 'Passing' | 'Attacking' | 'Setting' | 'Serving' | 'Defense' | 'Blocking' | 'Competition' | 'Warm-up';
     tags: string[];
     diagram_url?: string;
     created_at: string;

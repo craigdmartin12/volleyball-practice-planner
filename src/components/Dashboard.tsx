@@ -21,7 +21,7 @@ export const Dashboard: React.FC = () => {
     const [filterCategory, setFilterCategory] = useState<string>('All');
     const [isSortMenuOpen, setIsSortMenuOpen] = useState(false);
 
-    const categories = ['Passing', 'Attacking', 'Setting', 'Serving', 'Defense', 'Blocking', 'Competition'];
+    const categories = ['Passing', 'Attacking', 'Setting', 'Serving', 'Defense', 'Blocking', 'Competition', 'Warm-up'];
 
     const difficultyOrder = { 'Beginner': 0, 'Intermediate': 1, 'Advanced': 2 };
 
@@ -316,6 +316,7 @@ export const Dashboard: React.FC = () => {
                                     <option value="Defense">Defense</option>
                                     <option value="Blocking">Blocking</option>
                                     <option value="Competition">Competition</option>
+                                    <option value="Warm-up">Warm-up</option>
                                 </select>
                             </div>
 
