@@ -55,12 +55,16 @@ export const Dashboard: React.FC = () => {
 
     const handleSaveDrill = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (editingDrillId) {
-            await updateDrill(editingDrillId, newDrill);
-        } else {
-            await addDrill(newDrill as any);
+        try {
+            if (editingDrillId) {
+                await updateDrill(editingDrillId, newDrill);
+            } else {
+                await addDrill(newDrill as any);
+            }
+            closeModal();
+        } catch (error: any) {
+            alert(`Failed to save drill: ${error.message || 'Database error occurred'}`);
         }
-        closeModal();
     };
 
     const openCreateModal = () => {

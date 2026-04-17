@@ -99,6 +99,7 @@ export const useStore = create<AppState>((set, get) => ({
             set((state) => ({ drills: [newDrill, ...state.drills], loading: false }));
         } catch (error: any) {
             set({ error: error.message, loading: false });
+            throw error;
         }
     },
 
@@ -112,6 +113,7 @@ export const useStore = create<AppState>((set, get) => ({
             }));
         } catch (error: any) {
             set({ error: error.message, loading: false });
+            throw error;
         }
     },
 

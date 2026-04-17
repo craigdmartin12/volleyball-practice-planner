@@ -5,7 +5,7 @@ EXCEPTION
 END $$;
 
 DO $$ BEGIN
-    CREATE TYPE drill_category AS ENUM ('Passing', 'Attacking', 'Setting', 'Serving', 'Defense', 'Blocking', 'Competition');
+    CREATE TYPE drill_category AS ENUM ('Passing', 'Attacking', 'Setting', 'Serving', 'Defense', 'Blocking', 'Competition', 'Warm-up');
 EXCEPTION
     WHEN duplicate_object THEN null;
 END $$;
